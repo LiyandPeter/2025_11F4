@@ -9,13 +9,15 @@ import com.course.model.Toyota;
 public class AppMain {
 
 	public static void main(String[] args) {
-		ApplicationContext ctx = new AnnotationConfigApplicationContext(AppConfig.class);
+		ApplicationContext ctx = new AnnotationConfigApplicationContext("com.course.config");
+//		ApplicationContext ctx = new AnnotationConfigApplicationContext(AppConfig.class);
 
 		for (String name : ctx.getBeanDefinitionNames()) {
 			System.out.println(name);
 		}
 		
 		Toyota car = ctx.getBean("toyota", Toyota.class);
+		// TEST
 		car.move();
 	}
 
