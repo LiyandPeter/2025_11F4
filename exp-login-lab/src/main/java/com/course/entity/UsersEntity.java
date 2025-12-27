@@ -1,16 +1,20 @@
 package com.course.entity;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import lombok.Data;
 
-
+@Data
 @Entity
 @Table(name = "users")
 public class UsersEntity {
 
 	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Integer id;
 	
 	private String username;
@@ -19,6 +23,7 @@ public class UsersEntity {
 	
 	private String email;
 	
+	@Column(name = "img_name")
 	private String imgName;
 
 	public Integer getId() {
@@ -60,6 +65,7 @@ public class UsersEntity {
 	public void setImgName(String imgName) {
 		this.imgName = imgName;
 	}
+	
 	
 	
 }

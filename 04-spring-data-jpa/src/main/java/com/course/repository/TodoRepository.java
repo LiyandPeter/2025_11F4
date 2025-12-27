@@ -1,11 +1,17 @@
 package com.course.repository;
 
+import java.util.Date;
 import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import com.course.entity.TodoEntity;
+
+import jakarta.transaction.Transactional;
 
 @Repository
 public interface TodoRepository extends JpaRepository<TodoEntity, Integer> {
@@ -33,5 +39,46 @@ public interface TodoRepository extends JpaRepository<TodoEntity, Integer> {
 
 	// SQL語句：select * from todo where id <= ?
 	List<TodoEntity> findByIdLessThanEqual(Integer id);
+	
+	List<TodoEntity> findByDuedateBetween(Date startDate, Date endDate);
+	
+	List<TodoEntity> findByIdAndTitleOrDuedateAndStatus(Integer id, String title, Date duedate, Integer status);
+	
+	// SQL語句：select * from todo order by duedate;
+	List<TodoEntity> findAllByOrderByDuedate();
+	
+	// SQL語句：select * from todo where title like ? order by due_date desc;
+	List<TodoEntity> findByTitleStartingWithOrderByDuedate(String title);
+	
+	// SQL語句：select * from todo where title like ? order by due_date desc;
+	List<TodoEntity> findByTitleStartingWithOrderByDuedateDesc(String title);
+	
+	// select * from todo where status = 1;
+	// JPQL
+	@Query("SELECT T FROM TodoEntity T WHERE T.status = ?1")
+	List<TodoEntity> findByQuery(Integer status);
+	
+	// Named Param
+	@Query("SELECT T FROM TodoEntity T WHERE T.status = :s1 AND T.title = :t1")
+	List<TodoEntity> findByQuery2(@Param("t1") String title, @Param("s1") Integer status);
+	
+	// @Query("SELECT T FROM TodoEntity T WHERE T.status = ?1")
+	@Query(nativeQuery = true, value = "SELECT * FROM TODO T WHERE T.STATUS = ?1")
+	List<TodoEntity> findByNativeQuery(Integer status);
+	
+	@Transactional
+	@Modifying
+	@Query("UPDATE TodoEntity SET title = ?1 WHERE id = ?2")
+	void updateByQuery(String title, Integer id);
+	
+	@Transactional
+	@Modifying
+	// @Query("INSERT INTO TodoEntity (title, duedate, status) VALUES (?1,?2 ,?3)")
+	@Query(nativeQuery = true , value = "INSERT INTO Todo (title, duedate, status) VALUES (?1,?2 ,?3)")
+	void insertByQuery(String title, Date duedate, Integer status);
+	
+	@Modifying
+	@Query(nativeQuery = true , value = "delete from todo where status = ?1")
+	void deleteByStatus(Integer status);
 	
 }

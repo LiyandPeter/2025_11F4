@@ -7,9 +7,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
-import jakarta.persistence.Transient;
 
 //@Data
 @Entity
@@ -24,6 +22,9 @@ public class TodoEntity {
 	private String title;
 	
 	private Date duedate;
+	
+//	@Column(name = "due_date")
+//	private Date dueDate;
 
 	private Integer status;
 	
