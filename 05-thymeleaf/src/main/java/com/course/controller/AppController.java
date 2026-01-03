@@ -5,9 +5,16 @@ import java.util.List;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 
+import com.course.model.BookVo;
 import com.course.model.UserVo;
+
+import jakarta.validation.Valid;
 
 @Controller
 public class AppController {
@@ -31,7 +38,63 @@ public class AppController {
 		model.addAttribute("param2", "福利蓮");
 		
 		model.addAttribute("users", userList);
+		
+		model.addAttribute("isLogin", true);
+		
+		model.addAttribute("username", "Kitty");
+		
+		String name = "Kitty3";
+		String usernameDisp = "";
+		switch (name) {
+		case "Kitty":
+			usernameDisp = "佛殺凱蒂貓";
+			break;
+		case "Snoopy":
+			usernameDisp = "史奴比";
+			break;
+		default:
+			usernameDisp = "其他";
+		}
+		
+		model.addAttribute("usernameDisp", usernameDisp);
+		
+		model.addAttribute("imageName", "iPhone17_w.jpg");
 		return "app";
+	}
+	
+	@GetMapping("/book")
+	public String toBook(Model model) {
+		model.addAttribute("book", new BookVo());
+		return "book";
+	}
+	
+	@GetMapping("/book/{id}")
+	public String toBookPathVariable(@PathVariable Integer id) {
+		System.out.println("ID:" + id);
+		return "book";
+	}
+	
+	@GetMapping("/books")
+	public String toBookRequestParam(Integer page, String keyword) {
+		System.out.println("page:" + page);
+		System.out.println("keyword:" + keyword);
+		return "book";
+	}
+	
+	@PostMapping("/addBook")
+	public String addBook(@Valid @ModelAttribute("book") BookVo bookVo, BindingResult bindingResult, Model model) {
+		System.out.println(bookVo);
+		model.addAttribute("book", bookVo);
+		if (bindingResult.hasErrors()) {
+			// 如果檢核失敗，會到原本畫面，提示錯誤訊息
+			return "book";
+		}
+		
+		// 如果檢核成功,才 Service 新增書籍
+		bookVo.setAuthor(bookVo.getAuthor() + "!!!!!!");
+		// 檢核欄位內容
+		
+		return "book";
 	}
 	
 	public String test() {
@@ -39,6 +102,7 @@ public class AppController {
 				
 				""";
 		
+
 		return t;
 	}
 }
