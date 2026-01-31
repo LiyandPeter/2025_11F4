@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper namespace="com.course.dao.mapper.BookMapper">
+
+	<select id="findAllBook2" resultType="com.course.dto.BookDto">
+		SELECT * FROM BOOK
+	</select>
+	
+	<insert id="insertBookByXml" parameterType="bookDto"
+		useGeneratedKeys = "true" keyProperty = "id">
+		INSERT INTO BOOK 
+		(NAME, AUTHOR, IMG_NAME, BUY_DATE) 
+		VALUES 
+		(#{name}, #{author}, #{imgName}, #{buyDate})
+	</insert>
+	
+	<update id="updateBookByXml" parameterType="bookDto">
+		UPDATE BOOK
+	    <set>
+	        <if test="name != null and name != '' ">NAME = #{name},</if>
+	        <if test="author != null and author != '' ">AUTHOR = #{author},</if>
+	    </set>
+		WHERE ID = #{id}
+	</update>
+	
+	<delete id="deleteByIdByXml" parameterType="long">
+		DELETE FROM BOOK WHERE ID = #{id}
+	</delete>
+	
+	<select id="findStoreByXml" parameterType="StoreDto">
+		SELECT
+		S.CODE,
+		S.NAME,
+		P.ADDRESS
+		FROM STORE S 
+		LEFT JOIN STORE_PROFILE P ON P.STORE_ID = S.ID
+		<where>
+			<if test="code != null and code != '' ">AND S.CODE = #{code}</if>
+			<if test="name != null and name != '' ">OR S.NAME LIKE CONCAT('%', #{name}, '%')</if>
+		</where>
+
+	</select>
+	
+	
+	<resultMap type="bookDto" id="bookMap">
+	    <id property="id" column="ID"/>
+	    <result property="name" column="NAME"/>
+	    <result property="author" column="AUTHOR"/>
+	    <result property="buyDate" column="BUY_DATE"/>
+	    <collection property="categories" ofType="string">
+	        <result column="CATEGORY"/>
+	    </collection>
+	</resultMap>
+
+	<select id="findBookWithCategory" resultMap="bookMap">
+		SELECT
+	    B.ID,
+	    B.NAME,
+	    B.AUTHOR,
+	    B.BUY_DATE,
+	    C.CATEGORY
+		FROM BOOK B 
+		LEFT JOIN BOOK_CATEGORY C ON C.BOOK_ID = B.ID
+	</select>
+	
+	<resultMap type="BookDto" id="bookMap2">
+	    <id property="id" column="ID"/>
+	    <result property="name" column="NAME"/>
+	    <result property="author" column="IMG_NAME"/>
+	    <result property="buyDate" column="BUY_DATE"/>
+	    <collection property="stores" ofType="StoreDto">
+	        <id property="id" column="STOREID" />
+	        <result property="code" column="STORECODE" />
+	        <result property="name" column="STORENAME" />
+	    </collection>
+	</resultMap>
+
+	<select id="findInvetoryByCode" parameterType="string" resultMap="bookMap2">
+	    SELECT 
+	    B.ID,
+	    B.NAME,
+	    B.BUY_DATE,
+	    B.IMG_NAME,
+	    S.ID STOREID,
+	    S.CODE STORECODE,
+	    S.NAME STORENAME
+	    FROM BOOK B
+	    JOIN INVENTORY I ON I.BOOK_ID = B.ID
+	    JOIN STORE S ON S.ID = I.STORE_ID
+	    WHERE S.CODE = #{code}
+	</select>
+	
+	<select id="findStoresInCode" parameterType="storeDto" resultType="storeDto">
+		SELECT
+		S.CODE,
+		S.NAME,
+		P.ADDRESS
+		FROM STORE S 
+		LEFT JOIN STORE_PROFILE P ON P.STORE_ID = S.ID
+		<where>
+	        <foreach collection="codes" item="code" open="S.CODE IN (" separator="," close=")" >
+	            #{code}
+	        </foreach>
+		</where>
+	</select>
+	
+</mapper>
